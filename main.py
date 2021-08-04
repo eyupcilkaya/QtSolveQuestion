@@ -4,6 +4,7 @@ from PyQt5.uic import loadUi
 import firebase_process
 import variables
 from PyQt5.QtCore import QThread
+from ui.mainui import Ui_MainWindow
 
 
 class ThreadClass(QThread):
@@ -22,10 +23,10 @@ class ThreadClass(QThread):
                 continue
 
 
-class MainWindow(QMainWindow, QFrame):
+class MainWindow(QMainWindow,Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        loadUi("main.ui", self)
+        self.setupUi(self)
 
 
         self.answer = ""
