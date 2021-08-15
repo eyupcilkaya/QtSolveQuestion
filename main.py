@@ -27,11 +27,12 @@ class MainWindow(QMainWindow, QFrame):
         super(MainWindow, self).__init__()
         loadUi("main.ui", self)
 
-
         self.answer = ""
         self.variablesObject = variables.Variables()
+        # sign_in button and submit button clicked connect method
         self.sign_in.clicked.connect(self.signInClicked)
         self.submit.clicked.connect(self.submitClicked)
+        # options clicked connect method
         self.option_a.clicked.connect(lambda: self.save("a"))
         self.option_b.clicked.connect(lambda: self.save("b"))
         self.option_c.clicked.connect(lambda: self.save("c"))
@@ -40,14 +41,13 @@ class MainWindow(QMainWindow, QFrame):
         self.widget.setEnabled(False)
         self.show()
 
+    # save answer method
     def save(self, answer):
         self.answer = answer
 
     def signInClicked(self):
         self.id = self.enter_id.text()
-
-        print(type(self.id))
-        print(self.id)
+        # If the name entered is not in the firebase, the variable will be true otherwise it will be false
         result = firebase_process.createFirebase(self.id)
         if result:
             self.info.setText("BİLGİ: Kayıt başarılı ile yapıldı.")
@@ -62,14 +62,15 @@ class MainWindow(QMainWindow, QFrame):
     def submitClicked(self):
         print("submit")
         self.widget.setEnabled(False)
-
+        # set answer to firebase
         firebase_process.writeFirebase(self.answer, self.id)
         self.info.setText("BİLGİ: Yeni soru için lütfen bekleyin.")
         self.startThread()
 
 
-    def refreshClicked(self):
+    def refresh(self):
 
+        # set new question
         self.widget.setEnabled(True)
         self.clear()
         quest, a, b, c, d, e = self.variablesObject.getQuestion()
@@ -84,9 +85,7 @@ class MainWindow(QMainWindow, QFrame):
             f'border-image : url({"1.jpg"}) 0 0 0 0 strech strech')
         self.info.setText("BİLGİ: Gönderme işleminden sonra değişiklik yapılamaz.")
 
-
-
-
+    # clear selected option
     def clear(self):
         self.option_a.setAutoExclusive(False)
         self.option_b.setAutoExclusive(False)
@@ -107,7 +106,8 @@ class MainWindow(QMainWindow, QFrame):
     def startThread(self):
         self.threadClass = ThreadClass(variablesObject=self.variablesObject, id=self.id)
         self.threadClass.start()
-        self.threadClass.finished.connect(self.refreshClicked)
+        # connect thread finish method
+        self.threadClass.finished.connect(self.refresh)
 
 
 app = QApplication(sys.argv)

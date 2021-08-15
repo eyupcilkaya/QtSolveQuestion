@@ -2,6 +2,7 @@ from pyrebase import pyrebase
 import firebaseConfigFile
 import numpy as np
 
+# connect firebase
 firebase = pyrebase.initialize_app(firebaseConfigFile.firebaseConfig)
 storage = firebase.storage()
 db = firebase.database()
@@ -14,10 +15,11 @@ def readFirebase(variablesObject,device):
         return 0
 
     elif data.val() == 1:
-        print("soru geldi")
+
         questionArray = []
         keyArray = ["question", "a", "b", "c", "d", "e"]
 
+        # get question from firebase
         data = (db.child(f"questions/{device}").get()).val()
 
         for i in keyArray:
@@ -26,17 +28,19 @@ def readFirebase(variablesObject,device):
         questionArray = np.asarray(questionArray)
 
         variablesObject.setQuestion(questionArray)
+
+        # get image from firebase
         storage.child(f"{device}/1.jpg").download("1.jpg")
-        print(questionArray)
         return 1
 
 
 def writeFirebase(answer,device):
+    # set answer and state to firebase
     db.child(f"state/{device}").set(0)
     db.child(f"answers/{device}").set(answer)
 
 def createFirebase(id):
-
+    # create new device in database
     if db.child(f"questions/{id}").get().val() == None:
         db.child(f"questions/{id}/a").set(0)
         db.child(f"questions/{id}/b").set(0)
@@ -45,6 +49,7 @@ def createFirebase(id):
         db.child(f"questions/{id}/e").set(0)
         db.child(f"questions/{id}/question").set(0)
         db.child(f"state/{id}").set(0)
+        db.child(f"answers/{id}").set("")
         return True
 
     else:
